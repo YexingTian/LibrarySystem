@@ -1,110 +1,148 @@
-# 图书馆管理系统
+# 图书管理系统
 
-### 概述
-基于Spring + Spring MVC + MyBatis的图书馆管理系统，使用Maven进行包管理。主要功能包括：图书查询、图书管理、图书编辑、读者管理、图书的借阅与归还以及借还日志记录等。
+# 📝项目介绍
 
-### 环境配置
-#### 开发环境：Windows 10，IntelliJ IDEA 2018.3
-#### 运行配置
-1. 首先安装Mysql5.7，设置用户名为root，密码为123456，并保证其在运行状态，并执行library.sql文件导入数据。
-2. 然后再配置Maven到环境变量中，在源代码目录下运行
-```sh
-# mvn jetty:run
+#### 项目技术栈👏👏
+
+图书后台管理系统，采用SpringBoot+Mybatius，页面使用Element框架，使用RESTful API风格编写接口。
+
+数据库使用mysql
+
+- Spring Boot
+
+- MyBatis-puls
+
+- MySQL
+
+- ElementUI
+
+#### 项目工具:  
+
+🤞🤞
+
+IntelliJ IDEA 2023.2.2+Navicat Premium 16+ElementUI
+
+#### 已实现功能
+
+- [x] 基本增删改查,联表查询
+- [x] 拦截器登录验证
+
+
+
+- 
+
+  
+
+# 🌹项目预览
+
+账号:admin 密码:123456
+
+#### 登录页面
+
+![image](https://cdn.jsdelivr.net/gh/1902756969/picgo_imgs@master/image.18lrmxt93a0w.webp)
+
+#### 图书管理
+
+![image](https://cdn.jsdelivr.net/gh/1902756969/picgo_imgs@master/image.xdkmk5gniv4.webp)
+
+#### 读者管理
+
+![image](https://cdn.jsdelivr.net/gh/1902756969/picgo_imgs@master/image.5j52ysin7ls0.webp)
+
+#### 借阅管理
+
+![image](https://cdn.staticaly.com/gh/1902756969/picgo_imgs@master/image.65bq21dep6g0.webp)
+
+
+
+
+
+
+
+## ✔数据库设计
+
+![image](https://cdn.jsdelivr.net/gh/1902756969/picgo_imgs@master/image.6w3zcl1ng9c0.webp)
+
+
+
+
+
+
+
+#### 读者表
+
+```sql
+DROP TABLE IF EXISTS `tbl_reader`;
+CREATE TABLE `tbl_reader`  (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `reader_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `reader_name` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `card_id` int(32) NULL DEFAULT NULL,
+  `education` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `create_date` date NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `reader_id`(`reader_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 ```
-3. 使用浏览器访问http://localhost:8080即可进入系统。
-
-### 概念设计
-用户分为两类：读者、图书馆管理员。图书馆管理员可以修改读者信息，修改书目信息，查看所有借还日志等；读者仅可以修改个人信息、借阅或归还书籍和查看自己的借还日志。
-<img src="./preview/1.png" style="width: 50%"><img src="./preview/2.png" style="width: 50%;float: right">
-
-#### 数据库E-R图
-<img src="./preview/3.png">
-
-### 逻辑设计
-共有6个表：
-
-#### 1. 图书书目表book_info
-| 名           | 类型    | 长度 | 小数点 | NULL | 用途     | 键   |
-| :----------- | :------ | ---- | ------ | ---- | -------- | ---- |
-| book_id      | bigint  | 20   | 0      | 否   | 图书号   | ✔    |
-| name         | varchar | 20   | 0      | 否   | 书名     |      |
-| author       | varchar | 15   | 0      | 否   | 作者     |      |
-| publish      | varchar | 20   | 0      | 否   | 出版社   |      |
-| ISBN         | varchar | 15   | 0      | 否   | 标准书号 |      |
-| introduction | text    | 0    | 0      | 是   | 简介     |      |
-| language     | varchar | 4    | 0      | 否   | 语言     |      |
-| price        | decimal | 10   | 2      | 否   | 价格     |      |
-| pub_date     | date    | 0    | 0      | 否   | 出版时间 |      |
-| class_id     | int     | 11   | 0      | 是   | 分类号   |      |
-| number       | int     | 11   | 0      | 是   | 剩余数量 |      |
-
-#### 2. 数据库管理员表admin
-| 名       | 类型    | 长度 | 小数点 | NULL | 用途   | 键   |
-| :------- | :------ | ---- | ------ | ---- | ------ | ---- |
-| admin_id | bigint  | 20   | 0      | 否   | 账号   | ✔    |
-| password | varchar | 15   | 0      | 否   | 密码   |      |
-| username | varchar | 15   | 0      | 是   | 用户名 |      |
-
-#### 3. 图书分类表class_info
-| 名         | 类型    | 长度 | 小数点 | NULL | 用途   | 键   |
-| :--------- | :------ | ---- | ------ | ---- | ------ | ---- |
-| class_id   | int     | 11   | 0      | 否   | 类别号 | ✔    |
-| class_name | varchar | 15   | 0      | 否   | 类别名 |      |
-
-#### 4. 借阅信息表lend_list
-| 名        | 类型   | 长度 | 小数点 | NULL | 用途     | 键   |
-| :-------- | :----- | ---- | ------ | ---- | -------- | ---- |
-| ser_num   | bigint | 20   | 0      | 否   | 流水号   | ✔    |
-| book_id   | bigint | 20   | 0      | 否   | 图书号   |      |
-| reader_id | bigint | 20   | 0      | 否   | 读者证号 |      |
-| lend_date | date   | 0    | 0      | 是   | 借出日期 |      |
-| back_date | date   | 0    | 0      | 是   | 归还日期 |      |
-
-#### 5. 借阅卡信息表reader_card
-| 名        | 类型    | 长度 | 小数点 | NULL | 用途     | 键   |
-| :-------- | :------ | ---- | ------ | ---- | -------- | ---- |
-| reader_id | bigint  | 20   | 0      | 否   | 读者证号 | ✔    |
-| password  | varchar | 15   | 0      | 否   | 密码     |      |
-| username  | varchar | 15   | 0      | 是   | 用户名   |      |
-
-#### 6. 读者信息表reader_info
-| 名        | 类型    | 长度 | 小数点 | NULL | 用途     | 键   |
-| :-------- | :------ | ---- | ------ | ---- | -------- | ---- |
-| reader_id | bigint  | 20   | 0      | 否   | 读者证号 | ✔    |
-| name      | varchar | 10   | 0      | 否   | 姓名     |      |
-| sex       | varchar | 2    | 0      | 否   | 性别     |      |
-| birth     | date    | 0    | 0      | 否   | 生日     |      |
-| address   | varchar | 50   | 0      | 否   | 地址     |      |
-| phone     | varchar | 15   | 0      | 否   | 电话     |      |
-
-### 功能展示
-#### 1.	首页登陆
-管理者账号：123456/123456
-读者账号：10000/123456
-<img src="./preview/5.png">
-
-#### 2.	管理员系统
-用登陆进入
-##### 2.1 图书管理
-<img src="./preview/6.png">
-
-##### 2.2 图书详情
-<img src="./preview/7.png">
-
-##### 2.3 读者管理
-<img src="./preview/8.png">
-
-##### 2.4 借还管理
-<img src="./preview/9.png">
-
-#### 3.	读者系统
-##### 3.1 查看全部图书
-<img src="./preview/10.png">
-
-##### 3.2 个人信息查看，可以修个个人信息
-<img src="./preview/11.png">
-
-##### 3.3 个人借阅情况查看
-<img src="./preview/12.png">
 
 
+
+#### 用户表
+
+```sql
+DROP TABLE IF EXISTS `tbl_user`;
+CREATE TABLE `tbl_user`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `login_name` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `user_name` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `password` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `status` varchar(11) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `create_date` date NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+```
+
+
+
+#### 借阅表
+
+```sql
+-- ----------------------------
+DROP TABLE IF EXISTS `tbl_borrow`;
+CREATE TABLE `tbl_borrow`  (
+  `isbn_log` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `bookname_log` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `readerid_log` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `readername_log` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `cardid_log` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `num` int(15) NOT NULL DEFAULT 1,
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `isbn_log`(`isbn_log`) USING BTREE,
+  INDEX `readerid_log`(`readerid_log`) USING BTREE,
+  CONSTRAINT `isbn_log` FOREIGN KEY (`isbn_log`) REFERENCES `tbl_book` (`isbn`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `tbl_borrow_ibfk_1` FOREIGN KEY (`readerid_log`) REFERENCES `tbl_reader` (`reader_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 145 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+```
+
+#### 图书表
+
+```sql
+DROP TABLE IF EXISTS `tbl_book`;
+CREATE TABLE `tbl_book`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `isbn` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `book_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `author` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `synopsis` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '简介',
+  `publisher` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `publication_date` date NULL DEFAULT NULL,
+  `last` int(11) NULL DEFAULT NULL,
+  `notes` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `isbn`(`isbn`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 64 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+```
+
+# 
